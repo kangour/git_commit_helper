@@ -49,7 +49,7 @@ function input(){
 current_branch=`git rev-parse --abbrev-ref HEAD`
 if [[ $current_branch == 'master' ]]
 then
-    answer=$(confirm 'In master branch, switch new?')
+    answer=$(confirm 'On master, switch new branch?')
     echo ''
     if [[ $answer == true ]]
     then
@@ -74,23 +74,23 @@ fi
 result=`git status -s | egrep -v "(^\ |^\?)" | egrep -o "(\ .*)" | sed 's/[ ]//g'`
 array=(${result// / })
 length=${#array[@]}
-body=''
+scope=''
 if [[ $length == 1 ]]
 then
     array=(${result//\// })
     length=${#array[@]}
     if [[ $length == 1 ]]
     then
-        body=$result
+        scope=$result
     else
-        body=${array[length-2]}/${array[length-1]}
+        scope=${array[length-2]}/${array[length-1]}
     fi
-    body=\($body\)
+    scope=\($scope\)
 else
     echo 'Multiple file submission'
-    body=\($current_branch\)
+    scope=\($current_branch\)
 fi
-echo 'body='$body
+echo 'scope='$scope
 
 
 commit_type=''
@@ -112,7 +112,8 @@ done
 echo 'type='$commit_type
 
 
-commit_note=`input 'commit message'`
-git commit -m "$commit_type$body: $commit_note"
+subject=`input 'commit message'`
+echo 'subject='$subject
+git commit -m "$commit_type$scope: $subject"
 git log --oneline -3
 echo 'Done!'
